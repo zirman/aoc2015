@@ -2,6 +2,7 @@ fun main() {
     fun part1(input: List<String>): Int {
         return input[0].count { it == '(' } - input[0].count { it == ')' }
     }
+
     fun part2(input: List<String>): Int {
         val steps = input[0]
         var floor = 0

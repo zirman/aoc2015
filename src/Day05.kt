@@ -20,6 +20,7 @@ fun main() {
             }
             return false
         }
+
         fun String.hasRepeat(): Boolean {
             return windowed(3).any { it[0] == it[2] }
         }

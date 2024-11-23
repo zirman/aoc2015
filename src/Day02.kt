@@ -11,6 +11,7 @@ fun main() {
             ((x + y + z) * 2) + x.coerceAtMost(y).coerceAtMost(z)
         }
     }
+
     fun part2(input: List<String>): Int {
         return input.sumOf {
             val (l, w, h) = it.split('x')

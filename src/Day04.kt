@@ -13,6 +13,7 @@ fun main() {
             i++
         }
     }
+
     fun part2(input: List<String>): Int {
         var i = 0
         while (true) {
