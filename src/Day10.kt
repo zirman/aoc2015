@@ -1,15 +1,43 @@
 fun main() {
-    fun part1(input: List<String>): Int {
-        return input.size
+    fun expand(s: String): String {
+        return buildString {
+            var i = 0
+            while (i < s.length) {
+                var k = i + 1
+                while (true) {
+                    if (k >= s.length || s[k] != s[i]) {
+                        this@buildString.append(k - i)
+                        break
+                    }
+                    k++
+                }
+                this@buildString.append(s[i])
+                i = k
+            }
+        }
     }
-    fun part2(input: List<String>): Int {
-        return input.size
+
+    fun part1(input: String): Int {
+        var i = input
+        repeat(40) {
+            i = expand(i)
+        }
+        return i.length
     }
-    check(part1(listOf("test_input")) == 1)
-    val testInput = readInput("Day10_test")
-    check(part1(testInput) == 1)
-    val input = readInput("Day10")
+
+    fun part2(input: String): Int {
+        var i = input
+        repeat(50) {
+            i = expand(i)
+        }
+        return i.length
+    }
+    check(expand("1") == "11")
+    check(expand("11") == "21")
+    check(expand("21") == "1211")
+    check(expand("1211") == "111221")
+    check(expand("111221") == "312211")
+    val input = "1321131112"
     part1(input).println()
-//    check(part2(testInput) == 1)
-//    part2(input).println()
+    part2(input).println()
 }
