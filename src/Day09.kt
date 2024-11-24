@@ -5,14 +5,14 @@ fun <T> List<T>.permute(prefix: List<T> = emptyList()): List<List<T>> {
         return listOf(prefix)
     }
     return flatMapIndexed { index, t ->
-        buildList {
+        buildList(size - 1) {
             this@permute.forEachIndexed { index2, t ->
                 if (index != index2) {
                     add(t)
                 }
             }
         }.permute(
-            buildList {
+            buildList(prefix.size + 1) {
                 addAll(prefix)
                 add(t)
             },
