@@ -1,3 +1,5 @@
+import kotlin.system.measureTimeMillis
+
 private data class Ingredient(
     val name: String,
     val capacity: Int,
@@ -7,10 +9,10 @@ private data class Ingredient(
     val calories: Int,
 )
 
-fun permuteElements(elementCount: Int, total: Int): List<IntArray> {
-    fun MutableList<IntArray>.recur(prefix: IntArray, elementCount: Int, total: Int) {
+fun permuteElements(numElements: Int, total: Int): Sequence<IntArray> {
+    suspend fun SequenceScope<IntArray>.recur(prefix: IntArray, elementCount: Int, total: Int) {
         if (elementCount == 1) {
-            add(prefix + total)
+            yield(prefix + total)
         } else {
             (0..total).forEach { scoops ->
                 recur(prefix + scoops, elementCount - 1, total - scoops)
@@ -18,7 +20,7 @@ fun permuteElements(elementCount: Int, total: Int): List<IntArray> {
         }
     }
 
-    return buildList { recur(IntArray(0), elementCount, total) }
+    return sequence { recur(IntArray(0), numElements, total) }
 }
 
 fun main() {
@@ -31,7 +33,7 @@ fun main() {
             val (name, capacity, durability, flavor, texture, calories) = ingredientRegex.matchEntire(line)!!.destructured
             Ingredient(name, capacity.toInt(), durability.toInt(), flavor.toInt(), texture.toInt(), calories.toInt())
         }
-        return permuteElements(elementCount = ingredients.size, total = 100).map { scoops ->
+        return permuteElements(numElements = ingredients.size, total = 100).maxOf { scoops ->
             val capacity = ingredients.mapIndexed { index, ingredient ->
                 scoops[index] * ingredient.capacity
             }.sum().coerceAtLeast(0)
@@ -45,7 +47,7 @@ fun main() {
                 scoops[index] * ingredient.texture
             }.sum().coerceAtLeast(0)
             capacity * durability * flavor * texture
-        }.max()
+        }
     }
 
     fun part2(input: List<String>): Int {
@@ -53,7 +55,7 @@ fun main() {
             val (name, capacity, durability, flavor, texture, calories) = ingredientRegex.matchEntire(line)!!.destructured
             Ingredient(name, capacity.toInt(), durability.toInt(), flavor.toInt(), texture.toInt(), calories.toInt())
         }
-        return permuteElements(ingredients.size, 100).map { scoops ->
+        return permuteElements(ingredients.size, 100).maxOf { scoops ->
             val capacity = ingredients.mapIndexed { index, ingredient ->
                 scoops[index] * ingredient.capacity
             }.sum().coerceAtLeast(0)
@@ -74,7 +76,7 @@ fun main() {
             } else {
                 0
             }
-        }.max()
+        }
     }
     check(
         part1(
