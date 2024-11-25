@@ -7,25 +7,18 @@ private data class Ingredient(
     val calories: Int,
 )
 
-private fun makeScoops(count: Int, spoons: Int): List<List<Int>> = when (count) {
-    0 -> {
-        emptyList()
-    }
-
-    1 -> {
-        listOf(listOf(spoons))
-    }
-
-    else -> {
-        (0..spoons).flatMap { scoops ->
-            makeScoops(count - 1, spoons - scoops).map { tail ->
-                buildList {
-                    add(scoops)
-                    addAll(tail)
-                }
+fun permuteElements(elementCount: Int, total: Int): List<IntArray> {
+    fun MutableList<IntArray>.recur(prefix: IntArray, elementCount: Int, total: Int) {
+        if (elementCount == 1) {
+            add(prefix + total)
+        } else {
+            (0..total).forEach { scoops ->
+                recur(prefix + scoops, elementCount - 1, total - scoops)
             }
         }
     }
+
+    return buildList { recur(IntArray(0), elementCount, total) }
 }
 
 fun main() {
@@ -38,7 +31,7 @@ fun main() {
             val (name, capacity, durability, flavor, texture, calories) = ingredientRegex.matchEntire(line)!!.destructured
             Ingredient(name, capacity.toInt(), durability.toInt(), flavor.toInt(), texture.toInt(), calories.toInt())
         }
-        return makeScoops(ingredients.size, 100).map { scoops ->
+        return permuteElements(elementCount = ingredients.size, total = 100).map { scoops ->
             val capacity = ingredients.mapIndexed { index, ingredient ->
                 scoops[index] * ingredient.capacity
             }.sum().coerceAtLeast(0)
@@ -60,7 +53,7 @@ fun main() {
             val (name, capacity, durability, flavor, texture, calories) = ingredientRegex.matchEntire(line)!!.destructured
             Ingredient(name, capacity.toInt(), durability.toInt(), flavor.toInt(), texture.toInt(), calories.toInt())
         }
-        return makeScoops(ingredients.size, 100).map { scoops ->
+        return permuteElements(ingredients.size, 100).map { scoops ->
             val capacity = ingredients.mapIndexed { index, ingredient ->
                 scoops[index] * ingredient.capacity
             }.sum().coerceAtLeast(0)
