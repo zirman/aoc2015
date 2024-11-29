@@ -1,5 +1,3 @@
-import kotlin.system.measureTimeMillis
-
 private data class Ingredient(
     val name: String,
     val capacity: Int,

@@ -1,5 +1,3 @@
-import kotlin.system.measureTimeMillis
-
 fun <T> List<T>.permute(prefix: List<T> = emptyList()): List<List<T>> {
     if (isEmpty()) {
         return listOf(prefix)
