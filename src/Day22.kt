@@ -1,6 +1,6 @@
 import java.util.PriorityQueue
 
-data class WizSim(
+private data class WizSim(
     var bossHp: Int,
     var wizardsTurn: Boolean = true,
     var hp: Int = 50,
@@ -11,14 +11,21 @@ data class WizSim(
     var rechargeTimer: Int = 0,
 )
 
-fun WizSim.isGameOver(): Boolean = isWin() || isLoss()
-fun WizSim.isWin(): Boolean = bossHp <= 0
-fun WizSim.isLoss(): Boolean = hp <= 0
+private fun WizSim.isWin(): Boolean = bossHp <= 0
+private fun WizSim.isLoss(): Boolean = hp <= 0
 
-private fun WizSim.iterate(queue: PriorityQueue<WizSim>, bossDamage: Int) {
+private fun WizSim.iterate(queue: PriorityQueue<WizSim>, bossDamage: Int, hardMode: Boolean = false) {
     copy().run {
         if (wizardsTurn) {
             wizardsTurn = false
+            if (hardMode) {
+                hp -= 1
+                // check for
+                if (isLoss()) {
+                    queue.add(copy())
+                    return@run
+                }
+            }
             // passive effects
             if (shieldTimer > 0) {
                 shieldTimer--
@@ -32,7 +39,7 @@ private fun WizSim.iterate(queue: PriorityQueue<WizSim>, bossDamage: Int) {
                 bossHp -= 3
             }
             // check for boss death
-            if (isGameOver()) {
+            if (isWin()) {
                 queue.add(copy())
                 return@run
             }
@@ -106,7 +113,7 @@ private fun WizSim.iterate(queue: PriorityQueue<WizSim>, bossDamage: Int) {
                 bossDamage
             }
             // check for boss death
-            if (isGameOver()) {
+            if (isWin()) {
                 queue.add(copy())
             } else {
                 hp -= adjustedBossDamage
@@ -132,8 +139,19 @@ fun main() {
         }
     }
 
-    fun part2(input: List<String>): Int {
-        return input.size
+    fun part2(bossHp: Int, bossDamage: Int): Int {
+        val q = PriorityQueue<WizSim>(compareBy<WizSim> { it.spent }.thenBy { it.bossHp })
+        q.add(WizSim(bossHp = bossHp))
+        while (true) {
+            val ws = q.remove()
+            if (ws.isWin()) {
+                return ws.spent
+            }
+            if (ws.isLoss()) {
+                continue
+            }
+            ws.iterate(q, bossDamage, hardMode = true)
+        }
     }
 
     val (bossHp, bossDamage) = """
@@ -141,5 +159,5 @@ fun main() {
         Damage: 8
     """.trimIndent().split('\n').map { line -> line.split(": ")[1].toInt() }
     part1(bossHp, bossDamage).println()
-//    part2(input).println()
+    part2(bossHp, bossDamage).println()
 }
