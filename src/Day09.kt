@@ -18,29 +18,6 @@ fun <T> List<T>.permute(prefix: List<T> = emptyList()): List<List<T>> {
     }
 }
 
-fun IntArray.permute(prefix: IntArray = IntArray(0)): List<IntArray> {
-    if (isEmpty()) {
-        return listOf(prefix)
-    }
-    return flatMapIndexed { index, t ->
-        IntArray(this@permute.size - 1) { i ->
-            if (i >= index) {
-                this@permute[i + 1]
-            } else {
-                this@permute[i]
-            }
-        }.permute(
-            IntArray(prefix.size + 1) { i ->
-                if (i < prefix.size) {
-                    prefix[i]
-                } else {
-                    t
-                }
-            },
-        )
-    }
-}
-
 fun main() {
     val regex = """([a-zA-Z]+) to ([a-zA-Z]+) = (\d+)""".toRegex()
     fun routeDistances(input: List<String>): List<Int> {
