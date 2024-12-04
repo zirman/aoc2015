@@ -2,9 +2,11 @@ private typealias Input24 = List<Long>
 
 fun <T> List<T>.dropAt(index: Int): List<T> = filterIndexed { i, t -> index != i }
 
+private data class Compartments(val cabinPackageWeights: List<Long>, val trunkPackageWeights: List<Long>)
+
 fun main() {
     fun List<String>.parse(): Input24 = map { it.toLong() }
-    fun List<Long>.quantumEntanglement(): Long = reduce { a, b -> a * b }
+    fun Compartments.quantumEntanglement(): Long = cabinPackageWeights.reduce { a, b -> a * b }
     fun List<Long>.weight(): Long = sum()
 
     fun List<Long>.balance(total: Long): Boolean = when {
@@ -14,31 +16,31 @@ fun main() {
         else -> drop(1).balance(total - first()) || drop(1).balance(total)
     }
 
-    fun search(items: List<Long>, count: Int, foo: Int = 2): List<Pair<List<Long>, List<Long>>> {
-        fun MutableList<Pair<List<Long>, List<Long>>>.recur(packages: List<Long>, passengerPackages: List<Long>) {
-            if (passengerPackages.size == count) {
-                if (passengerPackages.weight() * foo == packages.weight() &&
-                    packages.balance(passengerPackages.weight())
+    fun search(packageWeights: List<Long>, packageCountInCabin: Int, compartments: Int = 2): List<Compartments> {
+        fun MutableList<Compartments>.recur(packageWeights: List<Long>, cabinPackageWeights: List<Long>) {
+            if (cabinPackageWeights.size == packageCountInCabin) {
+                if (cabinPackageWeights.weight() * compartments == packageWeights.weight() &&
+                    packageWeights.balance(cabinPackageWeights.weight())
                 ) {
-                    add(Pair(passengerPackages, packages))
+                    add(Compartments(cabinPackageWeights, packageWeights))
                 }
                 return
             }
-            packages.forEachIndexed { i, t ->
-                recur(packages.dropAt(i), passengerPackages + t)
+            packageWeights.forEachIndexed { i, t ->
+                recur(packageWeights.dropAt(i), cabinPackageWeights + t)
             }
         }
         return buildList {
-            recur(items, emptyList())
+            recur(packageWeights, emptyList())
         }
     }
 
     fun Input24.part1(): Long {
         (1..size).forEach { i ->
             search(this, i)
-                .minByOrNull { (a, _) -> a.quantumEntanglement() }
+                .minByOrNull { it.quantumEntanglement() }
                 ?.run {
-                    return@part1 first.quantumEntanglement()
+                    return@part1 quantumEntanglement()
                 }
         }
         throw IllegalStateException()
@@ -46,10 +48,10 @@ fun main() {
 
     fun Input24.part2(): Long {
         (1..size).forEach { i ->
-            search(items = this, count = i, foo = 3)
-                .minByOrNull { (a, _) -> a.quantumEntanglement() }
+            search(packageWeights = this, packageCountInCabin = i, compartments = 3)
+                .minByOrNull { it.quantumEntanglement() }
                 ?.run {
-                    return@part2 first.quantumEntanglement()
+                    return@part2 quantumEntanglement()
                 }
         }
         throw IllegalStateException()
