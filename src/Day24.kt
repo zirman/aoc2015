@@ -1,23 +1,5 @@
 private typealias Input24 = List<Long>
 
-fun <T> List<T>.dropAt(index: Int): List<T> = filterIndexed { i, t -> index != i }
-
-private fun <T> select(items: List<T>, size: Int): List<List<T>> {
-    fun MutableList<List<T>>.recur(index: Int, include: List<T>) {
-        if (include.size == size) {
-            add(include)
-            return
-        }
-
-        (index..<items.size).forEach { t ->
-            recur(t + 1, include + items[t])
-        }
-    }
-    return buildList {
-        recur(0, emptyList())
-    }
-}
-
 fun main() {
     fun List<String>.parse(): Input24 = map { it.toLong() }
     fun List<Long>.quantumEntanglement(): Long = reduce { a, b -> a * b }
@@ -30,28 +12,21 @@ fun main() {
         else -> drop(1).balance(total - first()) || drop(1).balance(total)
     }
 
-    fun search(packageWeights: List<Long>, packageCountInCabin: Int, trunks: Int): Long? {
-        val packageWeightsTotal = packageWeights.total()
-        return select(packageWeights, packageCountInCabin)
-            .filter { it.total() * (trunks + 1) == packageWeightsTotal }
-            .sortedBy { it.quantumEntanglement() }
-            .firstOrNull { (packageWeights - it).balance(it.total()) }
-            ?.quantumEntanglement()
-    }
-
-    fun Input24.part1(): Long {
-        (1..size).forEach { i ->
-            search(packageWeights = this, packageCountInCabin = i, trunks = 2)?.run { return@part1 this }
+    fun search(packageWeights: List<Long>, trunks: Int): Long {
+        (1..packageWeights.size).forEach { packageCountInCabin ->
+            val packageWeightsTotal = packageWeights.total()
+            packageWeights.combination(packageCountInCabin)
+                .filter { it.total() * (trunks + 1) == packageWeightsTotal }
+                .sortedBy { it.quantumEntanglement() }
+                .firstOrNull { (packageWeights - it).balance(it.total()) }
+                ?.quantumEntanglement()
+                ?.run { return this }
         }
         throw IllegalStateException()
     }
 
-    fun Input24.part2(): Long {
-        (1..size).forEach { i ->
-            search(packageWeights = this, packageCountInCabin = i, trunks = 3)?.run { return@part2 this }
-        }
-        throw IllegalStateException()
-    }
+    fun Input24.part1(): Long = search(packageWeights = this, trunks = 2)
+    fun Input24.part2(): Long = search(packageWeights = this, trunks = 3)
     check(
         """
             1

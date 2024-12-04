@@ -19,7 +19,7 @@ fun main() {
             throw IllegalStateException("No matching regex (${line})")
         }
         val names = relation.keys.flatMap { (a, b) -> listOf(a, b) }.toSet().toList()
-        return names.permute().maxOf { arrangement ->
+        return names.permutation().maxOf { arrangement ->
             arrangement.indices.sumOf { index ->
                 relation[Pair(arrangement[index], arrangement[(index + 1).mod(arrangement.size)])]!! +
                         relation[Pair(arrangement[index], arrangement[(index - 1).mod(arrangement.size)])]!!
@@ -45,7 +45,7 @@ fun main() {
             throw IllegalStateException("No matching regex (${line})")
         }
         val names = relation.keys.flatMap { (a, b) -> listOf(a, b) }.toSet().toList().plus("_")
-        return names.permute().maxOf { arrangement ->
+        return names.permutation().maxOf { arrangement ->
             arrangement.indices.sumOf { index ->
                 if (arrangement[index] == "_") {
                     0
